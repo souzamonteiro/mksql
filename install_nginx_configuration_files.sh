@@ -9,4 +9,5 @@ ln -s /etc/nginx/sites-available/meet.maiascript.com.conf /etc/nginx/sites-enabl
 /etc/init.d/nginx stop
 /etc/init.d/nginx start
 
+sudo certbot certonly --nginx
 #sudo certbot renew --dry-run
