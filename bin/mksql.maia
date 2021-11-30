@@ -52,7 +52,7 @@ namespace mkSql {
                 system.log(JSON.stringify(tableData[j]))
             }
             if (core.length(tableData[j, keyColumn]) >= keyColumnLength) {
-                columnsData = core.toString(idSeed) + ", "
+                columnsData = core.toString(n) + ", "
                 for  (k = 0; k < columnsNumbers.length; k = k + 1) {
                     if (core.type(columnsFormaters[k]) != "undefined") {
                         numberFormater = columnsFormaters[k]
@@ -102,7 +102,7 @@ namespace mkSql {
             columnsNumbers = []
             columnsMasks = []
             columnsFormaters = []
-            idSeed = 0
+            idSeed = 1
             keyColumn = 0
             keyColumnLength = 0
 
@@ -147,6 +147,9 @@ namespace mkSql {
                     } elseif (system.argv[i] == "--masks") {
                         i = i + 1
                         columnsMasks = core.splitCSV(system.argv[i], ", ", true, true)
+                    } elseif (system.argv[i] == "--seed") {
+                        i = i + 1
+                        idSeed = core.eval(system.argv[i])
                     } elseif (system.argv[i] == "-t") {
                         i = i + 1
                         tableName = system.argv[i]
@@ -191,8 +194,10 @@ namespace mkSql {
 
                                 // Read the file contents.
                                 //fileContents = readFile(String(file))
-                                fileContents = system.parseCSV(file, linesToSkip, separators, allowRepeatChar, doEval)
+                                fileContents = system.loadCSV(file, linesToSkip, separators, allowRepeatChar, doEval)
 
+                                //system.println(system.createCSV(fileContents, ";", ["code", "product_description", "price", "puchase_date", "puchase_time"]))
+                                
                                 if (columnsMasks.length > 0) {
                                     local StringMask = system.require("string-mask")
                                     for (j = 0; j < columnsMasks.length; j = j + 1) {
