@@ -45,7 +45,7 @@ namespace mkSql {
     function createSQLInsertScript(tableData, tableName, columnsNames, columnsNumbers, keyColumn, keyColumnLength, columnsFormaters, trimColumns, idSeed) {
         // Create SQL INSERT commands.
         outputContents = ""
-
+                            
         n = idSeed
 
         for (j = 0; j < tableData.length; j = j + 1) {
@@ -57,7 +57,12 @@ namespace mkSql {
                 for  (k = 0; k < columnsNumbers.length; k = k + 1) {
                     if (core.type(columnsFormaters[k]) != "undefined") {
                         numberFormater = columnsFormaters[k]
-                        columnsData = columnsData + "'" + numberFormater.apply(tableData[j, columnsNumbers[k]]) + "'"
+                        numberFormaterClass = numberFormater["constructor"]
+                        if (numberFormaterClass.name == "StringMask") {
+                            columnsData = columnsData + "'" + numberFormater.apply(tableData[j, columnsNumbers[k]]) + "'"
+                        } else {
+                            columnsData = columnsData + "'" + numberFormater(tableData[j, columnsNumbers[k]]) + "'"
+                        }
                     } else {
                         if (trimColumns) {
                             columnsData = columnsData + "'" + core.trim(tableData[j, columnsNumbers[k]]) + "'"
@@ -76,6 +81,19 @@ namespace mkSql {
         }
 
         return(outputContents)
+    }
+
+    ///
+    /// Removes non-digit characters from an string.
+    /// @method onlyDigits
+    /// @memberof mkSql
+    /// @param {string}   str - String to remove non-digit characters.
+    /// @return {string}  Returns a script with all non-digit characters removed.
+    ///
+    function onlyDigits(str) {
+        r =  core.regExp("[^\\d]", "g")
+
+        return(str.replace(r, ""))
     }
 
     // Interpret the options passed on the command line,
@@ -206,12 +224,15 @@ namespace mkSql {
                                 fileContents = system.loadCSV(file, linesToSkip, separators, allowRepeatChar, doEval)
 
                                 //system.println(system.createCSV(fileContents, ";", ["code", "product_description", "price", "puchase_date", "puchase_time"]))
-                                
                                 if (columnsMasks.length > 0) {
                                     local StringMask = system.require("string-mask")
                                     for (j = 0; j < columnsMasks.length; j = j + 1) {
                                         if (core.length(columnsMasks[j]) > 0) {
-                                            columnsFormaters[j] := StringMask(columnsMasks[j])
+                                            if (columnsMasks[j] == "D") {
+                                                columnsFormaters[j] = mkSql.onlyDigits
+                                            } else {
+                                                columnsFormaters[j] := StringMask(columnsMasks[j])
+                                            }
                                         }
                                     }
                                 }

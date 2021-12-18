@@ -1,6 +1,6 @@
 {
   "name": "mksqlscript",
-  "version": "1.1.3",
+  "version": "1.1.4",
   "description": "Creates an SQL script to insert data into a relational database from a CSV file.",
   "main": "bin/mksql.maia",
   "scripts": {
