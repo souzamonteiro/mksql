@@ -39,13 +39,14 @@ namespace mkSql {
     /// @param {number}   keyColumnLength - Minimum size of the key column that will be used to decide whether or not to insert data into the database table.
     /// @param {object}   columnsFormaters - Formatters to format columns before inserting them into the database table.
     /// @param {object}   trimColumns - Removes left and right spaces in strings.
+    /// @param {object}   dateColumns - Numbers of columns with date data in dd/mm/yyyy.
     /// @param {number}   idSeed - Seed for tuple ids.
     /// @return {string}  Returns a script for inserting data into an SQL database.
     ///
-    function createSQLInsertScript(tableData, tableName, columnsNames, columnsNumbers, keyColumn, keyColumnLength, columnsFormaters, trimColumns, idSeed) {
+    function createSQLInsertScript(tableData, tableName, columnsNames, columnsNumbers, keyColumn, keyColumnLength, columnsFormaters, trimColumns, dateColumns, idSeed) {
         // Create SQL INSERT commands.
         outputContents = ""
-                            
+
         n = idSeed
 
         for (j = 0; j < tableData.length; j = j + 1) {
@@ -59,15 +60,47 @@ namespace mkSql {
                         numberFormater = columnsFormaters[k]
                         numberFormaterClass = numberFormater["constructor"]
                         if (numberFormaterClass.name == "StringMask") {
-                            columnsData = columnsData + "'" + numberFormater.apply(tableData[j, columnsNumbers[k]]) + "'"
+                            if (dateColumns.includes(k) && core.length(tableData[j, columnsNumbers[k]]) > 0) {
+                                columnsData = columnsData + "str_to_date('" + numberFormater.apply(tableData[j, columnsNumbers[k]]) + "', '%d-%m-%Y')"
+                            } else {
+                                if (core.length(tableData[j, columnsNumbers[k]]) == 0) {
+                                    columnsData = columnsData + "null"
+                                } else {
+                                    columnsData = columnsData + "'" + numberFormater.apply(tableData[j, columnsNumbers[k]]) + "'"
+                                }
+                            }
                         } else {
-                            columnsData = columnsData + "'" + numberFormater(tableData[j, columnsNumbers[k]]) + "'"
+                            if (dateColumns.includes(k) && core.length(tableData[j, columnsNumbers[k]]) > 0) {
+                                columnsData = columnsData + "str_to_date('" + numberFormater(tableData[j, columnsNumbers[k]]) + "', '%d-%m-%Y')"
+                            } else {
+                                if (core.length(tableData[j, columnsNumbers[k]]) == 0) {
+                                    columnsData = columnsData + "null"
+                                } else {
+                                    columnsData = columnsData + "'" + numberFormater(tableData[j, columnsNumbers[k]]) + "'"
+                                }
+                            }
                         }
                     } else {
                         if (trimColumns) {
-                            columnsData = columnsData + "'" + core.trim(tableData[j, columnsNumbers[k]]) + "'"
+                            if (dateColumns.includes(k) && core.length(tableData[j, columnsNumbers[k]]) > 0) {
+                                columnsData = columnsData + "str_to_date('" + core.trim(tableData[j, columnsNumbers[k]]) + "', '%d-%m-%Y')"
+                            } else {
+                                if (core.length(tableData[j, columnsNumbers[k]]) == 0) {
+                                    columnsData = columnsData + "null"
+                                } else {
+                                    columnsData = columnsData + "'" + core.trim(tableData[j, columnsNumbers[k]]) + "'"
+                                }
+                            }
                         } else {
-                            columnsData = columnsData + "'" + tableData[j, columnsNumbers[k]] + "'"
+                            if (dateColumns.includes(k) && core.length(tableData[j, columnsNumbers[k]]) > 0) {
+                                columnsData = columnsData + "str_to_date('" + tableData[j, columnsNumbers[k]] + "', '%d-%m-%Y')"
+                            } else {
+                                if (core.length(tableData[j, columnsNumbers[k]]) == 0) {
+                                    columnsData = columnsData + "null"
+                                } else {
+                                    columnsData = columnsData + "'" + tableData[j, columnsNumbers[k]] + "'"
+                                }
+                            }
                         }
                     }
                     if (k < columnsNumbers.length - 1) {
@@ -125,6 +158,7 @@ namespace mkSql {
             columnsNumbers = []
             columnsMasks = []
             trimColumns = false
+            dateColumns = []
             columnsFormaters = []
             idSeed = 1
             keyColumn = 0
@@ -147,6 +181,7 @@ namespace mkSql {
                         system.log("       --eval               Run core.eval before adding the column to the record.")
                         system.log("       --masks              Applies a mask to numeric data in specified columns.")
                         system.log("       --trim               Removes left and right spaces in strings.")
+                        system.log("       --dates              Numbers of columns with date data in dd/mm/yyyy.")
                         system.log("       --seed               Starting number for tuple ids.")
                         system.log("-t                          Table name.")
                         system.log("-c                          Columns names.")
@@ -174,6 +209,9 @@ namespace mkSql {
                         columnsMasks = core.splitCSV(system.argv[i], ", ", true, true)
                     } elseif (system.argv[i] == "--trim") {
                         trimColumns = true
+                    } elseif (system.argv[i] == "--dates") {
+                        i = i + 1
+                        dateColumns = core.splitCSV(system.argv[i], ", ", true, true)
                     } elseif (system.argv[i] == "--seed") {
                         i = i + 1
                         idSeed = core.eval(system.argv[i])
@@ -238,7 +276,7 @@ namespace mkSql {
                                 }
 
                                 // Create SQL INSERT commands.
-                                outputContents = mkSql.createSQLInsertScript(fileContents, tableName, columnsNames, columnsNumbers, keyColumn, keyColumnLength, columnsFormaters, trimColumns, idSeed)
+                                outputContents = mkSql.createSQLInsertScript(fileContents, tableName, columnsNames, columnsNumbers, keyColumn, keyColumnLength, columnsFormaters, trimColumns, dateColumns, idSeed)
 
                                 // Sets the output file.
                                 if (outputFile == "") {
