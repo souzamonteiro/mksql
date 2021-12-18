@@ -55,16 +55,15 @@ namespace mkSql {
             if (core.length(tableData[j, keyColumn]) >= keyColumnLength) {
                 columnsData = core.toString(n) + ", "
                 for  (k = 0; k < columnsNumbers.length; k = k + 1) {
-                    if (trimColumns) {
-                        if (tableData[j, columnsNumbers[k]] == "string") {
-                            tableData[j, columnsNumbers[k]] = core.trim(tableData[j, columnsNumbers[k]])
-                        }
-                    }
                     if (core.type(columnsFormaters[k]) != "undefined") {
                         numberFormater = columnsFormaters[k]
                         columnsData = columnsData + "'" + numberFormater.apply(tableData[j, columnsNumbers[k]]) + "'"
                     } else {
-                        columnsData = columnsData + "'" + tableData[j, columnsNumbers[k]] + "'"
+                        if (trimColumns) {
+                            columnsData = columnsData + "'" + core.trim(tableData[j, columnsNumbers[k]]) + "'"
+                        } else {
+                            columnsData = columnsData + "'" + tableData[j, columnsNumbers[k]] + "'"
+                        }
                     }
                     if (k < columnsNumbers.length - 1) {
                         columnsData = columnsData + ", "
