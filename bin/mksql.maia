@@ -107,7 +107,7 @@ namespace mkSql {
                                     } else {
                                         columnsData = columnsData + "'" + core.trim(tableData[j, columnsNumbers[k]]) + "'"
                                     }
-                                }
+                                } 
                             } else {
                                 if (dateColumns.includes(k) && core.length(tableData[j, columnsNumbers[k]]) > 0) {
                                     columnsData = columnsData + "str_to_date('" + tableData[j, columnsNumbers[k]] + "', '%d-%m-%Y')"
@@ -122,7 +122,7 @@ namespace mkSql {
                         }
                         if (k < columnsNumbers.length - 1) {
                             columnsData = columnsData + ", "
-                        }
+                        }     
                     }
                     outputContents = outputContents + "insert into " + tableName + " (" + columnsNames + ") values (" + columnsData + ");\n"
 
@@ -130,6 +130,7 @@ namespace mkSql {
                 }
             } catch (e) {
                 system.log("Error parsing record: " + JSON.stringify(tableData[j]))
+                system.log("Error message: " + e)
             }
         }
 
