@@ -55,78 +55,80 @@ namespace mkSql {
                 if (showDebugInfo) {
                     system.log(JSON.stringify(tableData[j]))
                 }
-                parseRecord = false
-                if (exactLength) {
-                    if (core.length(tableData[j, keyColumn]) == keyColumnLength) {
-                        parseRecord = true
-                    }
-                } else {
-                    if (core.length(tableData[j, keyColumn]) >= keyColumnLength) {
-                        parseRecord = true
-                    }
-                }
-                if (parseRecord) {
-                    columnsData = core.toString(n) + ", "
-                    for  (k = 0; k < columnsNumbers.length; k = k + 1) {
-                        if (core.type(columnsFormaters[k]) != "undefined") {
-                            numberFormater = columnsFormaters[k]
-                            numberFormaterClass = numberFormater["constructor"]
-                            if (numberFormaterClass.name == "StringMask") {
-                                if (dateColumns.includes(k) && core.length(tableData[j, columnsNumbers[k]]) > 0) {
-                                    columnsData = columnsData + "str_to_date('" + numberFormater.apply(tableData[j, columnsNumbers[k]]) + "', '%d-%m-%Y')"
-                                } else {
-                                    if (core.length(tableData[j, columnsNumbers[k]]) == 0) {
-                                        columnsData = columnsData + "null"
-                                    } else {
-                                        columnsData = columnsData + "'" + numberFormater.apply(tableData[j, columnsNumbers[k]]) + "'"
-                                    }
-                                }
-                            } else {
-                                if (dateColumns.includes(k) && core.length(tableData[j, columnsNumbers[k]]) > 0) {
-                                    columnsData = columnsData + "str_to_date('" + numberFormater(tableData[j, columnsNumbers[k]]) + "', '%d-%m-%Y')"
-                                } else {
-                                    if (core.length(tableData[j, columnsNumbers[k]]) == 0) {
-                                        columnsData = columnsData + "null"
-                                    } else {
-                                        if (core.length(numberFormater(tableData[j, columnsNumbers[k]])) > 0) {
-                                            columnsData = columnsData + "'" + numberFormater(tableData[j, columnsNumbers[k]]) + "'"
-                                        } else {
-                                            columnsData = columnsData + "null"
-                                        }
-
-                                    }
-                                }
-                            }
-                        } else {
-                            if (trimColumns) {
-                                if (dateColumns.includes(k) && core.length(tableData[j, columnsNumbers[k]]) > 0) {
-                                    columnsData = columnsData + "str_to_date('" + core.trim(tableData[j, columnsNumbers[k]]) + "', '%d-%m-%Y')"
-                                } else {
-                                    if (core.length(tableData[j, columnsNumbers[k]]) == 0) {
-                                        columnsData = columnsData + "null"
-                                    } else {
-                                        columnsData = columnsData + "'" + core.trim(tableData[j, columnsNumbers[k]]) + "'"
-                                    }
-                                } 
-                            } else {
-                                if (dateColumns.includes(k) && core.length(tableData[j, columnsNumbers[k]]) > 0) {
-                                    columnsData = columnsData + "str_to_date('" + tableData[j, columnsNumbers[k]] + "', '%d-%m-%Y')"
-                                } else {
-                                    if (core.length(tableData[j, columnsNumbers[k]]) == 0) {
-                                        columnsData = columnsData + "null"
-                                    } else {
-                                        columnsData = columnsData + "'" + tableData[j, columnsNumbers[k]] + "'"
-                                    }
-                                }
-                            }
+                if (tableData[j] != "") {
+                    parseRecord = false
+                    if (exactLength) {
+                        if (core.length(tableData[j, keyColumn]) == keyColumnLength) {
+                            parseRecord = true
                         }
-                        if (k < columnsNumbers.length - 1) {
-                            columnsData = columnsData + ", "
-                        }     
+                    } else {
+                        if (core.length(tableData[j, keyColumn]) >= keyColumnLength) {
+                            parseRecord = true
+                        }
                     }
-                    outputContents = outputContents + "insert into " + tableName + " (" + columnsNames + ") values (" + columnsData + ");\n"
+                    if (parseRecord) {
+                        columnsData = core.toString(n) + ", "
+                        for  (k = 0; k < columnsNumbers.length; k = k + 1) {
+                            if (core.type(columnsFormaters[k]) != "undefined") {
+                                numberFormater = columnsFormaters[k]
+                                numberFormaterClass = numberFormater["constructor"]
+                                if (numberFormaterClass.name == "StringMask") {
+                                    if (dateColumns.includes(k) && core.length(tableData[j, columnsNumbers[k]]) > 0) {
+                                        columnsData = columnsData + "str_to_date('" + numberFormater.apply(tableData[j, columnsNumbers[k]]) + "', '%d-%m-%Y')"
+                                    } else {
+                                        if (core.length(tableData[j, columnsNumbers[k]]) == 0) {
+                                            columnsData = columnsData + "null"
+                                        } else {
+                                            columnsData = columnsData + "'" + numberFormater.apply(tableData[j, columnsNumbers[k]]) + "'"
+                                        }
+                                    }
+                                } else {
+                                    if (dateColumns.includes(k) && core.length(tableData[j, columnsNumbers[k]]) > 0) {
+                                        columnsData = columnsData + "str_to_date('" + numberFormater(tableData[j, columnsNumbers[k]]) + "', '%d-%m-%Y')"
+                                    } else {
+                                        if (core.length(tableData[j, columnsNumbers[k]]) == 0) {
+                                            columnsData = columnsData + "null"
+                                        } else {
+                                            if (core.length(numberFormater(tableData[j, columnsNumbers[k]])) > 0) {
+                                                columnsData = columnsData + "'" + numberFormater(tableData[j, columnsNumbers[k]]) + "'"
+                                            } else {
+                                                columnsData = columnsData + "null"
+                                            }
 
-                    n = n + 1
+                                        }
+                                    }
+                                }
+                            } else {
+                                if (trimColumns) {
+                                    if (dateColumns.includes(k) && core.length(tableData[j, columnsNumbers[k]]) > 0) {
+                                        columnsData = columnsData + "str_to_date('" + core.trim(tableData[j, columnsNumbers[k]]) + "', '%d-%m-%Y')"
+                                    } else {
+                                        if (core.length(tableData[j, columnsNumbers[k]]) == 0) {
+                                            columnsData = columnsData + "null"
+                                        } else {
+                                            columnsData = columnsData + "'" + core.trim(tableData[j, columnsNumbers[k]]) + "'"
+                                        }
+                                    } 
+                                } else {
+                                    if (dateColumns.includes(k) && core.length(tableData[j, columnsNumbers[k]]) > 0) {
+                                        columnsData = columnsData + "str_to_date('" + tableData[j, columnsNumbers[k]] + "', '%d-%m-%Y')"
+                                    } else {
+                                        if (core.length(tableData[j, columnsNumbers[k]]) == 0) {
+                                            columnsData = columnsData + "null"
+                                        } else {
+                                            columnsData = columnsData + "'" + tableData[j, columnsNumbers[k]] + "'"
+                                        }
+                                    }
+                                }
+                            }
+                            if (k < columnsNumbers.length - 1) {
+                                columnsData = columnsData + ", "
+                            }     
+                        }
+                        outputContents = outputContents + "insert into " + tableName + " (" + columnsNames + ") values (" + columnsData + ");\n"
+
+                        n = n + 1
+                    }
                 }
             } catch (e) {
                 system.log("Error parsing record: " + JSON.stringify(tableData[j]))
