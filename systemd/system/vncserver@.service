@@ -1,0 +1,11 @@
+[Unit]
+Description=Remote desktop service (VNC)
+After=syslog.target network.target
+
+[Service]
+Type=forking
+
+ExecStart=/usr/sbin/runuser -l coder -c "/home/coder/tigervncserver.sh"
+
+[Install]
+WantedBy=multi-user.target

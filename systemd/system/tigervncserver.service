@@ -1,0 +1,13 @@
+[Unit]
+Description=tigervncserver
+After=lightdm.service
+
+[Service]
+Type=simple
+User=coder
+WorkingDirectory=/home/coder
+ExecStart=/home/coder/tigervncserver.sh
+Restart=always
+
+[Install]
+WantedBy=default.target

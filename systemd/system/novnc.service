@@ -1,0 +1,12 @@
+[Unit]
+Description=novnc
+After=vncserver@1.service
+
+[Service]
+Type=simple
+User=coder
+ExecStart=/snap/bin/novnc --listen 6081 --vnc localhost:5901
+Restart=always
+
+[Install]
+WantedBy=default.target
