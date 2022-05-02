@@ -196,7 +196,7 @@ namespace mkSql {
                         system.log(mkSql.appTitle + " Command Line Interface (CLI)")
                         system.log("Usage: " + mkSql.appName + " [options] [input file] [--] [arguments]")
                         system.log("Options:")
-                        system.log("-h     --help               Displays this help message;")
+                        system.log("-h     --help               Displays this help message.")
                         system.log("-o     [output file]        Output file name.")
                         system.log("-d                          Show debug information.")
                         system.log("-s                          Columns separators.")
